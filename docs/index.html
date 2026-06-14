@@ -4,183 +4,270 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GraphKAN: Ternary Kolmogorov-Arnold Network</title>
-    <meta name="description" content="GraphKAN — First KAN with discrete ternary weights {-1,0,+1}. 96.15% MNIST at 15.4 KB. Regularization by quantization.">
+    <meta name="description" content="First KAN with discrete ternary weights {-1,0,+1}. 96.15% MNIST at 15.4 KB.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: #0a0a0f;
-            color: #e0e0e0;
-            line-height: 1.6;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 30%, #f0e8d8 60%, #faf5ee 100%);
+            color: #3d3529;
+            line-height: 1.7;
+            min-height: 100vh;
         }
-        .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+        .shape:nth-child(1) {
+            width: 600px; height: 600px;
+            background: linear-gradient(135deg, #d4c5a9, #c9b99a);
+            top: -200px; left: -100px;
+            animation-delay: 0s;
+        }
+        .shape:nth-child(2) {
+            width: 400px; height: 400px;
+            background: linear-gradient(135deg, #e3d5c8, #d6c8b8);
+            bottom: -100px; right: -50px;
+            animation-delay: -7s;
+        }
+        .shape:nth-child(3) {
+            width: 300px; height: 300px;
+            background: linear-gradient(135deg, #c8b8a8, #b8a898);
+            top: 50%; left: 60%;
+            animation-delay: -14s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
-        /* Hero */
+        .section-glass {
+            padding: 48px 56px;
+            margin-bottom: 32px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.7);
+            transition: all 0.4s ease;
+            animation: fadeUp 0.6s ease-out both;
+        }
+        .section-glass:hover { background: rgba(255,255,255,0.58); }
+
         .hero {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
-            padding: 80px 0 60px;
-            border-bottom: 1px solid #1e1e3a;
+            padding: 100px 0 60px;
+            text-align: center;
+        }
+        .hero-glass {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 100px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.7);
+            font-size: 0.85em;
+            color: #8b7d6b;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: fadeDown 0.8s ease-out;
         }
         .hero h1 {
-            font-size: 2.8em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
+            font-size: 4em;
+            font-weight: 800;
+            color: #2d261b;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+            animation: fadeUp 0.8s ease-out;
         }
         .hero .subtitle {
-            font-size: 1.2em;
-            color: #9ca3af;
+            font-size: 1.15em;
+            color: #7a6d5e;
             margin-bottom: 24px;
+            font-weight: 300;
+            animation: fadeUp 0.8s ease-out 0.1s both;
         }
-        .hero .badge {
+        .hero .tagline {
+            font-size: 0.92em;
+            color: #9a8d7a;
+            font-weight: 300;
+            margin-bottom: 36px;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+        .badges { animation: fadeUp 0.8s ease-out 0.3s both; }
+        .badge {
             display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 8px 18px;
+            border-radius: 100px;
             font-size: 0.85em;
             font-weight: 500;
-            margin: 0 6px 6px 0;
+            margin: 0 5px 8px;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.6);
         }
-        .badge-red { background: #7f1d1d; color: #fca5a5; }
-        .badge-blue { background: #1e3a5f; color: #93c5fd; }
-        .badge-green { background: #14532d; color: #86efac; }
-        .badge-purple { background: #4c1d95; color: #c4b5fd; }
+        .badge-dark { background: rgba(45,38,27,0.08); }
+        .badge-accent { background: rgba(180,150,120,0.15); color: #6d5d4a; }
 
-        /* Metrics */
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1em;
+            margin: 6px 6px 6px 0;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #2d261b;
+            color: #f5f0e8;
+            box-shadow: 0 4px 16px rgba(45,38,27,0.15);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,38,27,0.2); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.7);
+            color: #2d261b;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.7); transform: translateY(-2px); }
+
         .metrics {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin: 40px 0;
+            gap: 20px;
+            margin: 40px 0 60px;
+            animation: fadeUp 0.8s ease-out 0.4s both;
         }
         .metric {
-            background: #13131f;
-            border: 1px solid #1e1e3a;
-            border-radius: 12px;
-            padding: 20px;
+            padding: 28px 16px;
             text-align: center;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.7);
+            transition: all 0.3s ease;
         }
-        .metric .value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #60a5fa;
-        }
-        .metric .label {
-            font-size: 0.85em;
-            color: #6b7280;
-            margin-top: 4px;
-        }
+        .metric:hover { transform: translateY(-4px); background: rgba(255,255,255,0.65); }
+        .metric .value { font-size: 2.4em; font-weight: 700; color: #2d261b; }
+        .metric .label { font-size: 0.8em; color: #8b7d6b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 
-        /* Sections */
-        section { padding: 48px 0; }
-        h2 {
-            font-size: 1.6em;
-            font-weight: 600;
-            color: #f3f4f6;
-            margin-bottom: 24px;
-            letter-spacing: -0.01em;
-        }
-        p { margin-bottom: 16px; color: #d1d5db; }
+        h2 { font-size: 1.5em; font-weight: 600; color: #2d261b; margin-bottom: 24px; letter-spacing: -0.01em; }
+        p { margin-bottom: 16px; color: #5a4f40; font-weight: 300; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 10px; padding-left: 24px; position: relative; color: #5a4f40; font-weight: 300; }
+        li::before { content: '✦'; position: absolute; left: 0; color: #c4b598; }
 
-        /* Tables */
-        table {
+        .svg-wrap {
             width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0 24px;
-            font-size: 0.9em;
+            display: flex;
+            justify-content: center;
+            margin: 8px 0 4px;
         }
-        th, td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #1e1e3a;
-            text-align: left;
+        .svg-wrap svg {
+            max-width: 100%;
+            height: auto;
         }
-        th {
-            background: #13131f;
-            color: #9ca3af;
-            font-weight: 500;
-        }
-        td { color: #d1d5db; }
-        tr:hover td { background: #13131f; }
-
-        /* Code */
-        code {
-            background: #1a1a2e;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            color: #a78bfa;
-        }
-        pre {
-            background: #13131f;
-            border: 1px solid #1e1e3a;
-            border-radius: 8px;
-            padding: 16px;
-            overflow-x: auto;
-            margin: 16px 0 24px;
-        }
-        pre code { background: none; padding: 0; }
-
-        /* Footer */
-        footer {
-            border-top: 1px solid #1e1e3a;
-            padding: 24px 0;
+        .svg-label {
             text-align: center;
-            color: #6b7280;
+            font-size: 0.85em;
+            color: #8b7d6b;
+            margin-top: 8px;
+        }
+
+        .author-block { display: flex; align-items: center; gap: 20px; padding: 16px 0 8px; flex-wrap: wrap; }
+        .author-avatar {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2d261b;
+        }
+        .author-info p { margin: 0; }
+        .author-info .name { font-weight: 600; color: #2d261b; }
+        .author-info .detail { font-size: 0.9em; color: #7a6d5e; }
+        a { color: #6d5d4a; }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: #8b7d6b;
             font-size: 0.85em;
         }
-        footer a { color: #60a5fa; text-decoration: none; }
+        footer a { color: #6d5d4a; text-decoration: none; border-bottom: 1px solid rgba(109,93,74,0.2); }
 
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            margin: 4px;
-            border: 1px solid #1e1e3a;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-            border: none;
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .btn-secondary {
-            background: transparent;
-            color: #93c5fd;
-        }
+        .section-glass:nth-child(1) { animation-delay: 0.1s; }
+        .section-glass:nth-child(2) { animation-delay: 0.2s; }
+        .section-glass:nth-child(3) { animation-delay: 0.3s; }
+        .section-glass:nth-child(4) { animation-delay: 0.4s; }
+        .section-glass:nth-child(5) { animation-delay: 0.5s; }
+        .section-glass:nth-child(6) { animation-delay: 0.6s; }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5em; }
             .metrics { grid-template-columns: repeat(2, 1fr); }
-            .hero h1 { font-size: 2em; }
+            .section-glass { padding: 32px 24px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Hero -->
-<div class="hero">
-    <div class="container">
-        <h1>GraphKAN</h1>
-        <div class="subtitle">Kolmogorov-Arnold Network with Discrete Ternary Weights {−1, 0, +1}</div>
-        <div>
-            <span class="badge badge-red">1.58 bits/param</span>
-            <span class="badge badge-blue">96.15% MNIST</span>
-            <span class="badge badge-green">15.4 KB model</span>
-            <span class="badge badge-purple">0 DSP inference</span>
-        </div>
-        <div style="margin-top: 20px;">
-            <a href="#paper" class="btn btn-primary">Read Paper</a>
-            <a href="https://github.com/Fakeonomics/graphkan-overview" class="btn btn-secondary">GitHub</a>
-        </div>
-    </div>
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
 </div>
 
 <div class="container">
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-glass">June 2026 &middot; Proprietary Technology</div>
+    <h1>GraphKAN</h1>
+    <div class="subtitle">Kolmogorov-Arnold Network with <strong>Discrete Ternary Weights</strong> {−1, 0, +1}</div>
+    <div class="tagline">First KAN quantized below 4-bit — 1.58 bits per parameter. Regularization by quantization. TinyML ready.</div>
+    <div class="badges">
+        <span class="badge badge-dark">1.58 bits/param</span>
+        <span class="badge badge-accent">96.15% MNIST</span>
+        <span class="badge badge-dark">15.4 KB model</span>
+        <span class="badge badge-accent">0 DSP inference</span>
+        <span class="badge badge-dark">49% natural sparsity</span>
+    </div>
+    <div class="btn-group">
+        <a href="#paper" class="btn btn-primary">Read Paper</a>
+        <a href="https://github.com/Fakeonomics/graphkan-overview" class="btn btn-secondary">GitHub</a>
+    </div>
+</div>
 
 <!-- Metrics -->
 <div class="metrics">
@@ -204,119 +291,324 @@
 
 <!-- Abstract -->
 <section id="paper">
-    <h2>Abstract</h2>
-    <p>
-        We present <strong>GraphKAN</strong>, the first Kolmogorov-Arnold Network (KAN) with 
-        discrete ternary weights {−1, 0, +1}, achieving 1.58 bits per parameter. 
-        Our 4-phase quantization-aware training pipeline yields a counterintuitive result: 
-        <strong>quantization to ternary weights improves accuracy</strong> from 94.77% (float) 
-        to 96.15% (ternary) on MNIST — a regularization-by-quantization effect.
-    </p>
-    <p>
-        The resulting model occupies 15.4 KB, fitting within the L1 cache of mainstream 
-        microcontrollers without requiring floating-point hardware. Random ternary KAN features 
-        with analytical least-squares output (ELM mode) achieve 99.3% of full backpropagation 
-        accuracy at 31.6 KB.
-    </p>
+    <div class="section-glass">
+        <h2>Abstract</h2>
+        <p>We present <strong>GraphKAN</strong>, the first Kolmogorov-Arnold Network with discrete ternary weights {−1, 0, +1}, achieving <strong>1.58 bits per parameter</strong>. Our 4-phase quantization-aware training pipeline yields a counterintuitive result: <strong>quantization to ternary weights improves accuracy</strong> from 94.77% (float) to 96.15% (ternary) on MNIST — a <strong>regularization-by-quantization</strong> effect.</p>
+        <p>The resulting model occupies <strong>15.4 KB</strong>, fitting within the L1 cache of mainstream microcontrollers without requiring floating-point hardware. Random ternary KAN features with analytical least-squares output (ELM mode) achieve <strong>99.3%</strong> of full backpropagation accuracy at 31.6 KB.</p>
+    </div>
 </section>
 
-<!-- Key Results -->
+<!-- Architecture Diagram -->
 <section>
-    <h2>Key Results</h2>
-    <table>
-        <tr><th>Dataset</th><th>Architecture</th><th>Size</th><th>Accuracy</th><th>Type</th></tr>
-        <tr><td>MNIST</td><td>256→100→10</td><td>15.4 KB</td><td><strong>96.15%</strong></td><td>Ternary QAT</td></tr>
-        <tr><td>MNIST</td><td>784→50→10</td><td>22.8 KB</td><td>95.93%</td><td>Ternary QAT</td></tr>
-        <tr><td>Fashion-MNIST</td><td>256→100→10</td><td>15.4 KB</td><td>86.68%</td><td>Ternary QAT</td></tr>
-        <tr><td>Fashion-MNIST</td><td>64→100→10</td><td>3.7 KB</td><td>74.5%</td><td>ELM (random + LSQ)</td></tr>
-        <tr><td>Fashion-MNIST</td><td>Conv2D QAT</td><td>102.8 KB</td><td>92.02%</td><td>Ternary CNN</td></tr>
-    </table>
+    <div class="section-glass">
+        <h2>GraphKAN Architecture</h2>
+        <div class="svg-wrap">
+            <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+                <defs>
+                    <filter id="g-glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <filter id="g-glass"><feGaussianBlur stdDeviation="2"/></filter>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b8a898"/></marker>
+                </defs>
+                <rect x="0" y="0" width="720" height="360" rx="20" fill="rgba(255,255,255,0.2)"/>
+                <!-- Edges (connections) -->
+                <path d="M 100 100 L 260 180" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 100 140 L 260 140" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 100 180 L 260 100" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 260 100 L 460 140" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 260 140 L 460 100" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 260 180 L 460 180" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 460 100 L 620 140" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 460 140 L 620 100" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <path d="M 460 180 L 620 180" stroke="#d4c5a9" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.6"/>
+                <!-- Input neurons -->
+                <circle cx="100" cy="100" r="28" fill="rgba(255,255,255,0.6)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="100" y="105" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">input</text>
+                <circle cx="100" cy="140" r="28" fill="rgba(255,255,255,0.6)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="100" y="145" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">input</text>
+                <circle cx="100" cy="180" r="28" fill="rgba(255,255,255,0.6)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="100" y="185" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">input</text>
+                <text x="100" y="230" text-anchor="middle" fill="#8b7d6b" font-size="11" font-weight="300">256 input</text>
+                <!-- Hidden neurons -->
+                <circle cx="260" cy="100" r="28" fill="rgba(220,200,180,0.5)" stroke="rgba(180,150,120,0.3)" stroke-width="1" filter="url(#g-glow)"/>
+                <text x="260" y="105" text-anchor="middle" fill="#5a4f40" font-size="10">hidden</text>
+                <circle cx="260" cy="140" r="28" fill="rgba(220,200,180,0.5)" stroke="rgba(180,150,120,0.3)" stroke-width="1" filter="url(#g-glow)"/>
+                <text x="260" y="145" text-anchor="middle" fill="#5a4f40" font-size="10">hidden</text>
+                <circle cx="260" cy="180" r="28" fill="rgba(220,200,180,0.5)" stroke="rgba(180,150,120,0.3)" stroke-width="1" filter="url(#g-glow)"/>
+                <text x="260" y="185" text-anchor="middle" fill="#5a4f40" font-size="10">hidden</text>
+                <text x="260" y="230" text-anchor="middle" fill="#8b7d6b" font-size="11" font-weight="300">100 hidden</text>
+                <!-- Output neurons -->
+                <circle cx="460" cy="100" r="28" fill="rgba(200,180,160,0.5)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="460" y="105" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">output</text>
+                <circle cx="460" cy="140" r="28" fill="rgba(200,180,160,0.5)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="460" y="145" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">output</text>
+                <circle cx="460" cy="180" r="28" fill="rgba(200,180,160,0.5)" stroke="rgba(180,150,120,0.4)" stroke-width="1.5" filter="url(#g-glow)"/>
+                <text x="460" y="185" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">output</text>
+                <text x="460" y="230" text-anchor="middle" fill="#8b7d6b" font-size="11" font-weight="300">10 output</text>
+                <!-- Cycles indicator -->
+                <path d="M 620 100 C 660 100 660 140 620 140" fill="none" stroke="#b8a898" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+                <text x="670" y="125" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="300">N cycles</text>
+                <!-- Edge function callout -->
+                <rect x="430" y="280" width="260" height="60" rx="12" fill="rgba(255,255,255,0.3)" stroke="rgba(180,150,120,0.3)" stroke-width="1"/>
+                <text x="560" y="300" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">Each edge: piecewise-linear</text>
+                <text x="560" y="316" text-anchor="middle" fill="#8b7d6b" font-size="9" font-weight="300">3 ternary CP {−1,0,+1}</text>
+                <text x="560" y="330" text-anchor="middle" fill="#8b7d6b" font-size="9" font-weight="300">tanh activation, 1/fan_in scale</text>
+                <line x1="488" y1="280" x2="460" y2="200" stroke="#b8a898" stroke-width="1" stroke-dasharray="3,3"/>
+                <!-- Ternary weight callout -->
+                <rect x="40" y="260" width="170" height="60" rx="12" fill="rgba(255,255,255,0.3)" stroke="rgba(180,150,120,0.3)" stroke-width="1"/>
+                <text x="125" y="280" text-anchor="middle" fill="#5a4f40" font-size="10" font-weight="500">Ternary weights</text>
+                <text x="125" y="296" text-anchor="middle" fill="#8b7d6b" font-size="9" font-weight="300">−1 = 00b, 0 = 01b, +1 = 10b</text>
+                <text x="125" y="310" text-anchor="middle" fill="#8b7d6b" font-size="9" font-weight="300">4 values / uint8 byte</text>
+                <line x1="80" y1="260" x2="100" y2="200" stroke="#b8a898" stroke-width="1" stroke-dasharray="3,3"/>
+            </svg>
+        </div>
+        <div class="svg-label">GraphKAN: 366 neurons, 26,600 edges, N synchronous update cycles</div>
+    </div>
 </section>
 
-<!-- ELM Mode -->
+<!-- QAT Pipeline -->
 <section>
-    <h2>Extreme Learning Machine (ELM) Mode</h2>
-    <table>
-        <tr><th>Hidden</th><th>Accuracy</th><th>% of Full BP</th><th>Size</th></tr>
-        <tr><td>50</td><td>74.5%</td><td>94.1%</td><td>3.7 KB</td></tr>
-        <tr><td>100</td><td>77.0%</td><td>97.3%</td><td>6.8 KB</td></tr>
-        <tr><td>500</td><td>78.7%</td><td><strong>99.3%</strong></td><td>31.6 KB</td></tr>
-    </table>
+    <div class="section-glass">
+        <h2>4-Phase QAT Pipeline</h2>
+        <div class="svg-wrap">
+            <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+                <defs>
+                    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b8a898"/></marker>
+                </defs>
+                <rect x="0" y="0" width="720" height="260" rx="20" fill="rgba(255,255,255,0.2)"/>
+                <!-- Phase boxes -->
+                <rect x="30" y="40" width="140" height="90" rx="16" fill="rgba(255,255,255,0.4)" stroke="rgba(180,150,120,0.3)" stroke-width="1.5"/>
+                <text x="100" y="70" text-anchor="middle" fill="#2d261b" font-size="12" font-weight="600">Phase 1</text>
+                <text x="100" y="88" text-anchor="middle" fill="#5a4f40" font-size="11">Float</text>
+                <text x="100" y="105" text-anchor="middle" fill="#8b7d6b" font-size="10">epochs 0–5</text>
+                <text x="100" y="122" text-anchor="middle" fill="#8b7d6b" font-size="10">clamp to [−1,1]</text>
+
+                <path d="M 170 85 L 200 85" stroke="#b8a898" stroke-width="2" marker-end="url(#arr)"/>
+
+                <rect x="210" y="40" width="140" height="90" rx="16" fill="rgba(255,255,255,0.4)" stroke="rgba(180,150,120,0.3)" stroke-width="1.5"/>
+                <text x="280" y="70" text-anchor="middle" fill="#2d261b" font-size="12" font-weight="600">Phase 2</text>
+                <text x="280" y="88" text-anchor="middle" fill="#5a4f40" font-size="11">STE ternary</text>
+                <text x="280" y="105" text-anchor="middle" fill="#8b7d6b" font-size="10">epochs 6–10</text>
+                <text x="280" y="122" text-anchor="middle" fill="#8b7d6b" font-size="10">+ absmean</text>
+
+                <path d="M 350 85 L 380 85" stroke="#b8a898" stroke-width="2" marker-end="url(#arr)"/>
+
+                <rect x="390" y="40" width="140" height="90" rx="16" fill="rgba(255,255,255,0.4)" stroke="rgba(180,150,120,0.3)" stroke-width="1.5"/>
+                <text x="460" y="70" text-anchor="middle" fill="#2d261b" font-size="12" font-weight="600">Phase 3</text>
+                <text x="460" y="88" text-anchor="middle" fill="#5a4f40" font-size="11">Hard clamp</text>
+                <text x="460" y="105" text-anchor="middle" fill="#8b7d6b" font-size="10">epochs 11–12</text>
+                <text x="460" y="122" text-anchor="middle" fill="#8b7d6b" font-size="10">true {−1,0,+1}</text>
+
+                <path d="M 530 85 L 560 85" stroke="#b8a898" stroke-width="2" marker-end="url(#arr)"/>
+
+                <rect x="570" y="40" width="120" height="90" rx="16" fill="rgba(255,255,255,0.5)" stroke="rgba(140,120,100,0.4)" stroke-width="2"/>
+                <text x="630" y="70" text-anchor="middle" fill="#2d261b" font-size="12" font-weight="600">Phase 4</text>
+                <text x="630" y="88" text-anchor="middle" fill="#5a4f40" font-size="11">Finetune</text>
+                <text x="630" y="105" text-anchor="middle" fill="#8b7d6b" font-size="10">epochs 13–15</text>
+                <text x="630" y="122" text-anchor="middle" fill="#8b7d6b" font-size="10">scale + bias</text>
+
+                <!-- Accuracy progression -->
+                <rect x="30" y="170" width="660" height="60" rx="14" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="360" y="190" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Accuracy progression</text>
+                <text x="100" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">94.77%</text>
+                <text x="280" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">95.78%</text>
+                <text x="460" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">96.09%</text>
+                <text x="630" y="212" text-anchor="middle" fill="#2d261b" font-size="14" font-weight="700">96.15%</text>
+                <!-- Delta labels -->
+                <text x="115" y="190" text-anchor="middle" fill="#b8a898" font-size="9">—</text>
+                <text x="295" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+1.01%</text>
+                <text x="475" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.31%</text>
+                <text x="645" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.06%</text>
+                <!-- Arrow between accuracy -->
+                <path d="M 140 205 L 240 205" stroke="#d4c5a9" stroke-width="1" marker-end="url(#arr)" opacity="0.5"/>
+                <path d="M 320 205 L 420 205" stroke="#d4c5a9" stroke-width="1" marker-end="url(#arr)" opacity="0.5"/>
+                <path d="M 500 205 L 590 205" stroke="#d4c5a9" stroke-width="1" marker-end="url(#arr)" opacity="0.5"/>
+            </svg>
+        </div>
+        <div class="svg-label">Accuracy increases stepwise during quantization — a novel regularization effect</div>
+    </div>
 </section>
 
-<!-- Novel Contributions -->
+<!-- ELM Results -->
 <section>
-    <h2>Novel Contributions</h2>
-    <ul style="color: #d1d5db; list-style: none; padding: 0;">
-        <li style="margin-bottom: 12px;">✦ <strong>First ternary KAN</strong> — All prior KANs use FP32 or 4-bit quantization</li>
-        <li style="margin-bottom: 12px;">✦ <strong>Regularization-by-quantization</strong> — Accuracy increases stepwise during QAT (94.77% → 96.15%)</li>
-        <li style="margin-bottom: 12px;">✦ <strong>Graph topology</strong> — Arbitrary directed graph with cyclic message passing</li>
-        <li style="margin-bottom: 12px;">✦ <strong>Extreme compression</strong> — 15.4 KB, fits Cortex-M0+ L1 cache</li>
-    </ul>
-</section>
-
-<!-- Pipeline -->
-<section>
-    <h2>4-Phase QAT Pipeline</h2>
-    <table>
-        <tr><th>Phase</th><th>Epochs</th><th>Description</th><th>Accuracy</th><th>Δ</th></tr>
-        <tr><td>1. Float</td><td>0–5</td><td>Clamp to [−1, 1]</td><td>94.77%</td><td>—</td></tr>
-        <tr><td>2. STE ternary</td><td>6–10</td><td>STE round + softmax</td><td>95.78%</td><td>+1.01%</td></tr>
-        <tr><td>3. Hard clamp</td><td>11–12</td><td>True {−1,0,+1}</td><td>96.09%</td><td>+0.31%</td></tr>
-        <tr><td>4. Finetune</td><td>13–15</td><td>Scale+bias only</td><td><strong>96.15%</strong></td><td>+0.06%</td></tr>
-    </table>
-</section>
-
-<!-- Hardware -->
-<section>
-    <h2>Hardware Efficiency</h2>
-    <p>Ternary multiplication = multiplexer (0 DSP slices):</p>
-    <pre><code>in × (+1) = in        # pass through
-in × (−1) = −in       # invert + 1
-in × 0    = 0         # zero</code></pre>
-    <table>
-        <tr><th>Target Chip</th><th>L1 Cache</th><th>Flash</th><th>Our Model</th></tr>
-        <tr><td>ARM Cortex-M0+ ($0.50)</td><td>—</td><td>16–64 KB</td><td>✅</td></tr>
-        <tr><td>ARM Cortex-M4</td><td>16 KB</td><td>512 KB</td><td>✅ in L1</td></tr>
-        <tr><td>ESP32-S3</td><td>16 KB</td><td>384 KB</td><td>✅ in L1</td></tr>
-        <tr><td>RISC-V (GD32V)</td><td>—</td><td>32 KB</td><td>✅</td></tr>
-    </table>
+    <div class="section-glass">
+        <h2>ELM Mode: Random Features + Least Squares</h2>
+        <div class="svg-wrap">
+            <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+                <defs>
+                    <filter id="g"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <rect x="0" y="0" width="720" height="300" rx="20" fill="rgba(255,255,255,0.2)"/>
+                <!-- Bars -->
+                <text x="80" y="270" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">H=50</text>
+                <text x="200" y="270" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">H=100</text>
+                <text x="320" y="270" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">H=200</text>
+                <text x="440" y="270" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">H=500</text>
+                <text x="580" y="270" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Full BP</text>
+                <!-- Bar backgrounds -->
+                <rect x="40" y="140" width="60" height="100" rx="6" fill="rgba(220,200,180,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <rect x="160" y="120" width="60" height="120" rx="6" fill="rgba(220,200,180,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <rect x="280" y="110" width="60" height="130" rx="6" fill="rgba(220,200,180,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <rect x="400" y="100" width="60" height="140" rx="6" fill="rgba(220,200,180,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <rect x="540" y="100" width="60" height="140" rx="6" fill="rgba(220,200,180,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <!-- Bar fills -->
+                <rect x="42" y="148" width="56" height="92" rx="4" fill="rgba(180,150,120,0.4)" stroke="rgba(180,150,120,0.5)" stroke-width="1"/>
+                <text x="70" y="160" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">74.5%</text>
+                <rect x="162" y="128" width="56" height="112" rx="4" fill="rgba(180,150,120,0.45)" stroke="rgba(180,150,120,0.5)" stroke-width="1"/>
+                <text x="190" y="160" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">77.0%</text>
+                <rect x="282" y="116" width="56" height="124" rx="4" fill="rgba(180,150,120,0.5)" stroke="rgba(180,150,120,0.5)" stroke-width="1"/>
+                <text x="310" y="160" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">77.7%</text>
+                <rect x="402" y="104" width="56" height="136" rx="4" fill="rgba(180,150,120,0.55)" stroke="rgba(180,150,120,0.5)" stroke-width="1"/>
+                <text x="430" y="160" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">78.7%</text>
+                <rect x="542" y="104" width="56" height="136" rx="4" fill="rgba(140,120,100,0.5)" stroke="rgba(140,120,100,0.5)" stroke-width="1"/>
+                <text x="570" y="160" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">79.2%</text>
+                <!-- Size labels -->
+                <text x="70" y="285" text-anchor="middle" fill="#8b7d6b" font-size="9">3.7 KB</text>
+                <text x="190" y="285" text-anchor="middle" fill="#8b7d6b" font-size="9">6.8 KB</text>
+                <text x="310" y="285" text-anchor="middle" fill="#8b7d6b" font-size="9">14 KB</text>
+                <text x="430" y="285" text-anchor="middle" fill="#8b7d6b" font-size="9">31.6 KB</text>
+                <text x="570" y="285" text-anchor="middle" fill="#8b7d6b" font-size="9">float</text>
+                <!-- % of BP labels -->
+                <text x="70" y="142" text-anchor="middle" fill="#b8a898" font-size="9">94.1%</text>
+                <text x="190" y="122" text-anchor="middle" fill="#b8a898" font-size="9">97.3%</text>
+                <text x="310" y="110" text-anchor="middle" fill="#b8a898" font-size="9">98.1%</text>
+                <text x="430" y="98" text-anchor="middle" fill="#b8a898" font-size="9">99.3%</text>
+                <!-- Title -->
+                <text x="360" y="36" text-anchor="middle" fill="#5a4f40" font-size="13" font-weight="500">Fashion-MNIST: Random GraphKAN + LSQ vs Full BP</text>
+            </svg>
+        </div>
+        <div class="svg-label">99.3% of backprop accuracy with zero hidden layer training — at 31.6 KB</div>
+    </div>
 </section>
 
 <!-- Comparison -->
 <section>
-    <h2>Comparison with Prior Art</h2>
-    <table>
-        <tr><th>Method</th><th>Year</th><th>KAN?</th><th>Ternary?</th><th>Bits/param</th></tr>
-        <tr><td>KAN (Liu et al.)</td><td>2024</td><td>✅</td><td>❌</td><td>32</td></tr>
-        <tr><td>QuantKAN</td><td>2025</td><td>✅</td><td>❌</td><td>4</td></tr>
-        <tr><td>KANtize</td><td>2026</td><td>✅</td><td>❌</td><td>2–3 (tables)</td></tr>
-        <tr><td>BiKA</td><td>2026</td><td>Inspired</td><td>❌</td><td>N/A</td></tr>
-        <tr><td>BitNet</td><td>2024</td><td>❌ (MLP)</td><td>✅</td><td>1.58</td></tr>
-        <tr><td><strong>GraphKAN (ours)</strong></td><td><strong>2026</strong></td><td><strong>✅</strong></td><td><strong>✅</strong></td><td><strong>1.58</strong></td></tr>
-    </table>
+    <div class="section-glass">
+        <h2>Comparison with Prior Art</h2>
+        <div class="svg-wrap">
+            <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+                <defs>
+                    <filter id="gl"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <rect x="0" y="0" width="720" height="260" rx="20" fill="rgba(255,255,255,0.2)"/>
+                <!-- Headers -->
+                <text x="100" y="45" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="500" text-transform="uppercase">Method</text>
+                <text x="280" y="45" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="500">KAN?</text>
+                <text x="380" y="45" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="500">Ternary?</text>
+                <text x="520" y="45" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="500">Bits/param</text>
+                <text x="660" y="45" text-anchor="middle" fill="#8b7d6b" font-size="10" font-weight="500">Year</text>
+                <line x1="30" y1="55" x2="690" y2="55" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <!-- KAN -->
+                <text x="100" y="82" text-anchor="middle" fill="#5a4f40" font-size="12">KAN</text>
+                <text x="280" y="82" text-anchor="middle" fill="#5a4f40" font-size="13">✓</text>
+                <text x="380" y="82" text-anchor="middle" fill="#b8a898" font-size="13">✗</text>
+                <text x="520" y="82" text-anchor="middle" fill="#5a4f40" font-size="12">32</text>
+                <text x="660" y="82" text-anchor="middle" fill="#8b7d6b" font-size="12">2024</text>
+                <!-- QuantKAN -->
+                <text x="100" y="108" text-anchor="middle" fill="#5a4f40" font-size="12">QuantKAN</text>
+                <text x="280" y="108" text-anchor="middle" fill="#5a4f40" font-size="13">✓</text>
+                <text x="380" y="108" text-anchor="middle" fill="#b8a898" font-size="13">✗</text>
+                <text x="520" y="108" text-anchor="middle" fill="#5a4f40" font-size="12">4</text>
+                <text x="660" y="108" text-anchor="middle" fill="#8b7d6b" font-size="12">2025</text>
+                <!-- KANtize -->
+                <text x="100" y="134" text-anchor="middle" fill="#5a4f40" font-size="12">KANtize</text>
+                <text x="280" y="134" text-anchor="middle" fill="#5a4f40" font-size="13">✓</text>
+                <text x="380" y="134" text-anchor="middle" fill="#b8a898" font-size="13">✗</text>
+                <text x="520" y="134" text-anchor="middle" fill="#5a4f40" font-size="12">2–3*</text>
+                <text x="660" y="134" text-anchor="middle" fill="#8b7d6b" font-size="12">2026</text>
+                <!-- BiKA -->
+                <text x="100" y="160" text-anchor="middle" fill="#5a4f40" font-size="12">BiKA</text>
+                <text x="280" y="160" text-anchor="middle" fill="#b8a898" font-size="13">~</text>
+                <text x="380" y="160" text-anchor="middle" fill="#b8a898" font-size="13">✗</text>
+                <text x="520" y="160" text-anchor="middle" fill="#8b7d6b" font-size="12">—</text>
+                <text x="660" y="160" text-anchor="middle" fill="#8b7d6b" font-size="12">2026</text>
+                <!-- BitNet -->
+                <text x="100" y="186" text-anchor="middle" fill="#5a4f40" font-size="12">BitNet</text>
+                <text x="280" y="186" text-anchor="middle" fill="#b8a898" font-size="13">✗</text>
+                <text x="380" y="186" text-anchor="middle" fill="#5a4f40" font-size="13">✓</text>
+                <text x="520" y="186" text-anchor="middle" fill="#5a4f40" font-size="12">1.58</text>
+                <text x="660" y="186" text-anchor="middle" fill="#8b7d6b" font-size="12">2024</text>
+                <!-- Divider -->
+                <line x1="30" y1="200" x2="690" y2="200" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <!-- GraphKAN -->
+                <rect x="50" y="210" width="620" height="36" rx="10" fill="rgba(180,150,120,0.12)" stroke="rgba(180,150,120,0.3)" stroke-width="1.5"/>
+                <text x="100" y="233" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="700">GraphKAN (ours)</text>
+                <text x="280" y="233" text-anchor="middle" fill="#2d261b" font-size="14" font-weight="700">✓</text>
+                <text x="380" y="233" text-anchor="middle" fill="#2d261b" font-size="14" font-weight="700">✓</text>
+                <text x="520" y="233" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="700">1.58</text>
+                <text x="660" y="233" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="700">2026</text>
+                <!-- Note -->
+                <text x="360" y="255" text-anchor="middle" fill="#8b7d6b" font-size="9">* KANtize quantizes B-spline tables, not weights</text>
+            </svg>
+        </div>
+        <div class="svg-label">First KAN with ternary weights — matching BitNet at 1.58 bits/param</div>
+    </div>
+</section>
+
+<!-- Hardware -->
+<section>
+    <div class="section-glass">
+        <h2>Hardware Efficiency</h2>
+        <div class="svg-wrap">
+            <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+                <defs><filter id="g2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                <rect x="0" y="0" width="720" height="200" rx="20" fill="rgba(255,255,255,0.2)"/>
+                <!-- Ternary multiply -->
+                <text x="70" y="45" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Ternary multiply</text>
+                <text x="70" y="62" text-anchor="middle" fill="#8b7d6b" font-size="10">= multiplexer (0 DSP)</text>
+                <rect x="20" y="75" width="100" height="24" rx="8" fill="rgba(220,200,180,0.3)" stroke="rgba(180,150,120,0.3)" stroke-width="1"/>
+                <text x="70" y="91" text-anchor="middle" fill="#5a4f40" font-size="11">+1 → pass</text>
+                <rect x="20" y="103" width="100" height="24" rx="8" fill="rgba(220,200,180,0.3)" stroke="rgba(180,150,120,0.3)" stroke-width="1"/>
+                <text x="70" y="119" text-anchor="middle" fill="#5a4f40" font-size="11">−1 → negate</text>
+                <rect x="20" y="131" width="100" height="24" rx="8" fill="rgba(220,200,180,0.3)" stroke="rgba(180,150,120,0.3)" stroke-width="1"/>
+                <text x="70" y="147" text-anchor="middle" fill="#5a4f40" font-size="11">0 → zero</text>
+                <!-- Chip compatibility -->
+                <text x="300" y="45" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Deployment targets</text>
+                <rect x="180" y="58" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="240" y="76" text-anchor="middle" fill="#5a4f40" font-size="10">Cortex-M0+ ($0.50)</text>
+                <rect x="310" y="58" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="370" y="76" text-anchor="middle" fill="#5a4f40" font-size="10">Cortex-M4 L1 cache</text>
+                <rect x="440" y="58" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="500" y="76" text-anchor="middle" fill="#5a4f40" font-size="10">ESP32-S3</text>
+                <rect x="180" y="94" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="240" y="112" text-anchor="middle" fill="#5a4f40" font-size="10">RISC-V GD32V</text>
+                <rect x="310" y="94" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="370" y="112" text-anchor="middle" fill="#5a4f40" font-size="10">Arduino RP2040</text>
+                <rect x="440" y="94" width="120" height="28" rx="10" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="500" y="112" text-anchor="middle" fill="#5a4f40" font-size="10">Smartwatch DSP</text>
+                <!-- Summary -->
+                <rect x="180" y="145" width="380" height="36" rx="12" fill="rgba(255,255,255,0.3)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
+                <text x="370" y="160" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">15.4 KB — fits in L1 cache of any modern microcontroller</text>
+                <text x="370" y="175" text-anchor="middle" fill="#8b7d6b" font-size="10">Zero FPU. Zero DSP. Only add/shift operations.</text>
+            </svg>
+        </div>
+        <div class="svg-label">Ternary weights eliminate DSP slices — deployable on $0.50 microcontrollers</div>
+    </div>
 </section>
 
 <!-- Author -->
 <section>
-    <h2>Author</h2>
-    <p style="color: #9ca3af; font-size: 1.1em;">
-        <strong>Yuri Venediktov (Fakeonomics)</strong> — independent researcher, 17 years old.
-        Invented ternary KAN and VSA multi-hop reasoning.<br>
-        <a href="https://github.com/Fakeonomics" style="color: #60a5fa;">github.com/Fakeonomics</a>
-    </p>
-    <p style="color: #6b7280; font-size: 0.9em;">
-        June 2026. Proprietary technology — All Rights Reserved.
-    </p>
+    <div class="section-glass">
+        <h2>Author</h2>
+        <div class="author-block">
+            <div class="author-avatar">YV</div>
+            <div class="author-info">
+                <p class="name">Yuri Venediktov (Fakeonomics)</p>
+                <p class="detail">Independent researcher, 17 years old. Invented ternary KAN and VSA multi-hop reasoning.</p>
+                <p class="detail"><a href="https://github.com/Fakeonomics">github.com/Fakeonomics</a></p>
+            </div>
+        </div>
+        <p style="color: #8b7d6b; font-size: 0.85em; margin-top: 16px;">June 2026. Proprietary technology — All Rights Reserved.</p>
+    </div>
 </section>
 
 </div>
 
 <footer>
     <div class="container">
-        <a href="https://github.com/Fakeonomics/graphkan-overview">GitHub</a> &middot;
+        <a href="https://github.com/Fakeonomics/graphkan-overview">GraphKAN GitHub</a> &middot;
         <a href="https://github.com/Fakeonomics/vsa-reasoning-overview">VSA Reasoning</a> &middot;
-        <span>All Rights Reserved</span>
+        <a href="https://fakeonomics.github.io/vsa-reasoning-overview/">VSA Paper Site</a>
     </div>
 </footer>
 
