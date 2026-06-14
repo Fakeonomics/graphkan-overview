@@ -56,6 +56,6 @@ Ternary values {-1,0,+1} stored in 2 bits each, 4 values per uint8 byte:
 ## Status
 
 Proprietary technology — All Rights Reserved. Codebase is private.
-For licensing inquiries or collaboration, contact via [GitHub](https://github.com/uv20817-prog).
+For licensing inquiries or collaboration, contact via [GitHub](https://github.com/Fakeonomics).
 
-*Created by uv20817-prog, June 2026.*
+*Created by Fakeonomics, June 2026.*
