@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphKAN: Ternary Kolmogorov-Arnold Network</title>
+    <meta name="description" content="GraphKAN — First KAN with discrete ternary weights {-1,0,+1}. 96.15% MNIST at 15.4 KB. Regularization by quantization.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+            padding: 80px 0 60px;
+            border-bottom: 1px solid #1e1e3a;
+        }
+        .hero h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        .hero .subtitle {
+            font-size: 1.2em;
+            color: #9ca3af;
+            margin-bottom: 24px;
+        }
+        .hero .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin: 0 6px 6px 0;
+        }
+        .badge-red { background: #7f1d1d; color: #fca5a5; }
+        .badge-blue { background: #1e3a5f; color: #93c5fd; }
+        .badge-green { background: #14532d; color: #86efac; }
+        .badge-purple { background: #4c1d95; color: #c4b5fd; }
+
+        /* Metrics */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 40px 0;
+        }
+        .metric {
+            background: #13131f;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric .value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        .metric .label {
+            font-size: 0.85em;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Sections */
+        section { padding: 48px 0; }
+        h2 {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #f3f4f6;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+        p { margin-bottom: 16px; color: #d1d5db; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1e1e3a;
+            text-align: left;
+        }
+        th {
+            background: #13131f;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        td { color: #d1d5db; }
+        tr:hover td { background: #13131f; }
+
+        /* Code */
+        code {
+            background: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #a78bfa;
+        }
+        pre {
+            background: #13131f;
+            border: 1px solid #1e1e3a;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 16px 0 24px;
+        }
+        pre code { background: none; padding: 0; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #1e1e3a;
+            padding: 24px 0;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+        footer a { color: #60a5fa; text-decoration: none; }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            margin: 4px;
+            border: 1px solid #1e1e3a;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #93c5fd;
+        }
+
+        @media (max-width: 640px) {
+            .metrics { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="container">
+        <h1>GraphKAN</h1>
+        <div class="subtitle">Kolmogorov-Arnold Network with Discrete Ternary Weights {−1, 0, +1}</div>
+        <div>
+            <span class="badge badge-red">1.58 bits/param</span>
+            <span class="badge badge-blue">96.15% MNIST</span>
+            <span class="badge badge-green">15.4 KB model</span>
+            <span class="badge badge-purple">0 DSP inference</span>
+        </div>
+        <div style="margin-top: 20px;">
+            <a href="#paper" class="btn btn-primary">Read Paper</a>
+            <a href="https://github.com/Fakeonomics/graphkan-overview" class="btn btn-secondary">GitHub</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- Metrics -->
+<div class="metrics">
+    <div class="metric">
+        <div class="value">96.15%</div>
+        <div class="label">MNIST Accuracy</div>
+    </div>
+    <div class="metric">
+        <div class="value">15.4 KB</div>
+        <div class="label">Model Size</div>
+    </div>
+    <div class="metric">
+        <div class="value">1.58</div>
+        <div class="label">Bits / Parameter</div>
+    </div>
+    <div class="metric">
+        <div class="value">49%</div>
+        <div class="label">Natural Sparsity</div>
+    </div>
+</div>
+
+<!-- Abstract -->
+<section id="paper">
+    <h2>Abstract</h2>
+    <p>
+        We present <strong>GraphKAN</strong>, the first Kolmogorov-Arnold Network (KAN) with 
+        discrete ternary weights {−1, 0, +1}, achieving 1.58 bits per parameter. 
+        Our 4-phase quantization-aware training pipeline yields a counterintuitive result: 
+        <strong>quantization to ternary weights improves accuracy</strong> from 94.77% (float) 
+        to 96.15% (ternary) on MNIST — a regularization-by-quantization effect.
+    </p>
+    <p>
+        The resulting model occupies 15.4 KB, fitting within the L1 cache of mainstream 
+        microcontrollers without requiring floating-point hardware. Random ternary KAN features 
+        with analytical least-squares output (ELM mode) achieve 99.3% of full backpropagation 
+        accuracy at 31.6 KB.
+    </p>
+</section>
+
+<!-- Key Results -->
+<section>
+    <h2>Key Results</h2>
+    <table>
+        <tr><th>Dataset</th><th>Architecture</th><th>Size</th><th>Accuracy</th><th>Type</th></tr>
+        <tr><td>MNIST</td><td>256→100→10</td><td>15.4 KB</td><td><strong>96.15%</strong></td><td>Ternary QAT</td></tr>
+        <tr><td>MNIST</td><td>784→50→10</td><td>22.8 KB</td><td>95.93%</td><td>Ternary QAT</td></tr>
+        <tr><td>Fashion-MNIST</td><td>256→100→10</td><td>15.4 KB</td><td>86.68%</td><td>Ternary QAT</td></tr>
+        <tr><td>Fashion-MNIST</td><td>64→100→10</td><td>3.7 KB</td><td>74.5%</td><td>ELM (random + LSQ)</td></tr>
+        <tr><td>Fashion-MNIST</td><td>Conv2D QAT</td><td>102.8 KB</td><td>92.02%</td><td>Ternary CNN</td></tr>
+    </table>
+</section>
+
+<!-- ELM Mode -->
+<section>
+    <h2>Extreme Learning Machine (ELM) Mode</h2>
+    <table>
+        <tr><th>Hidden</th><th>Accuracy</th><th>% of Full BP</th><th>Size</th></tr>
+        <tr><td>50</td><td>74.5%</td><td>94.1%</td><td>3.7 KB</td></tr>
+        <tr><td>100</td><td>77.0%</td><td>97.3%</td><td>6.8 KB</td></tr>
+        <tr><td>500</td><td>78.7%</td><td><strong>99.3%</strong></td><td>31.6 KB</td></tr>
+    </table>
+</section>
+
+<!-- Novel Contributions -->
+<section>
+    <h2>Novel Contributions</h2>
+    <ul style="color: #d1d5db; list-style: none; padding: 0;">
+        <li style="margin-bottom: 12px;">✦ <strong>First ternary KAN</strong> — All prior KANs use FP32 or 4-bit quantization</li>
+        <li style="margin-bottom: 12px;">✦ <strong>Regularization-by-quantization</strong> — Accuracy increases stepwise during QAT (94.77% → 96.15%)</li>
+        <li style="margin-bottom: 12px;">✦ <strong>Graph topology</strong> — Arbitrary directed graph with cyclic message passing</li>
+        <li style="margin-bottom: 12px;">✦ <strong>Extreme compression</strong> — 15.4 KB, fits Cortex-M0+ L1 cache</li>
+    </ul>
+</section>
+
+<!-- Pipeline -->
+<section>
+    <h2>4-Phase QAT Pipeline</h2>
+    <table>
+        <tr><th>Phase</th><th>Epochs</th><th>Description</th><th>Accuracy</th><th>Δ</th></tr>
+        <tr><td>1. Float</td><td>0–5</td><td>Clamp to [−1, 1]</td><td>94.77%</td><td>—</td></tr>
+        <tr><td>2. STE ternary</td><td>6–10</td><td>STE round + softmax</td><td>95.78%</td><td>+1.01%</td></tr>
+        <tr><td>3. Hard clamp</td><td>11–12</td><td>True {−1,0,+1}</td><td>96.09%</td><td>+0.31%</td></tr>
+        <tr><td>4. Finetune</td><td>13–15</td><td>Scale+bias only</td><td><strong>96.15%</strong></td><td>+0.06%</td></tr>
+    </table>
+</section>
+
+<!-- Hardware -->
+<section>
+    <h2>Hardware Efficiency</h2>
+    <p>Ternary multiplication = multiplexer (0 DSP slices):</p>
+    <pre><code>in × (+1) = in        # pass through
+in × (−1) = −in       # invert + 1
+in × 0    = 0         # zero</code></pre>
+    <table>
+        <tr><th>Target Chip</th><th>L1 Cache</th><th>Flash</th><th>Our Model</th></tr>
+        <tr><td>ARM Cortex-M0+ ($0.50)</td><td>—</td><td>16–64 KB</td><td>✅</td></tr>
+        <tr><td>ARM Cortex-M4</td><td>16 KB</td><td>512 KB</td><td>✅ in L1</td></tr>
+        <tr><td>ESP32-S3</td><td>16 KB</td><td>384 KB</td><td>✅ in L1</td></tr>
+        <tr><td>RISC-V (GD32V)</td><td>—</td><td>32 KB</td><td>✅</td></tr>
+    </table>
+</section>
+
+<!-- Comparison -->
+<section>
+    <h2>Comparison with Prior Art</h2>
+    <table>
+        <tr><th>Method</th><th>Year</th><th>KAN?</th><th>Ternary?</th><th>Bits/param</th></tr>
+        <tr><td>KAN (Liu et al.)</td><td>2024</td><td>✅</td><td>❌</td><td>32</td></tr>
+        <tr><td>QuantKAN</td><td>2025</td><td>✅</td><td>❌</td><td>4</td></tr>
+        <tr><td>KANtize</td><td>2026</td><td>✅</td><td>❌</td><td>2–3 (tables)</td></tr>
+        <tr><td>BiKA</td><td>2026</td><td>Inspired</td><td>❌</td><td>N/A</td></tr>
+        <tr><td>BitNet</td><td>2024</td><td>❌ (MLP)</td><td>✅</td><td>1.58</td></tr>
+        <tr><td><strong>GraphKAN (ours)</strong></td><td><strong>2026</strong></td><td><strong>✅</strong></td><td><strong>✅</strong></td><td><strong>1.58</strong></td></tr>
+    </table>
+</section>
+
+<!-- Author -->
+<section>
+    <h2>Author</h2>
+    <p style="color: #9ca3af; font-size: 1.1em;">
+        <strong>Yuri Venediktov (Fakeonomics)</strong> — independent researcher, 17 years old.
+        Invented ternary KAN and VSA multi-hop reasoning.<br>
+        <a href="https://github.com/Fakeonomics" style="color: #60a5fa;">github.com/Fakeonomics</a>
+    </p>
+    <p style="color: #6b7280; font-size: 0.9em;">
+        June 2026. Proprietary technology — All Rights Reserved.
+    </p>
+</section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <a href="https://github.com/Fakeonomics/graphkan-overview">GitHub</a> &middot;
+        <a href="https://github.com/Fakeonomics/vsa-reasoning-overview">VSA Reasoning</a> &middot;
+        <span>All Rights Reserved</span>
+    </div>
+</footer>
+
+</body>
+</html>
