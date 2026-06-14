@@ -1,6 +1,6 @@
 # Ternary GraphKAN
 
-**Patent Pending** | [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)]() 
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)]() 
 
 Kolmogorov-Arnold Networks with **discrete ternary weights** {-1, 0, +1}. First KAN quantized below 4-bit — achieves **1.58 bits per parameter** with a **15.4 KB model** at **96.15% accuracy** on MNIST.
 
