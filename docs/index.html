@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GraphKAN: Ternary Kolmogorov-Arnold Network</title>
-    <meta name="description" content="First KAN with discrete ternary weights {-1,0,+1}. 96.15% MNIST at 15.4 KB.">
+    <meta name="description" content="First KAN with ternary control points {-1,0,+1}. 95.35% MNIST at 19.95 KB, cross-domain results.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -262,8 +262,8 @@
     <div class="tagline">First KAN quantized below 4-bit — 1.58 bits per parameter. Regularization by quantization. TinyML ready.</div>
     <div class="badges">
         <span class="badge badge-dark">1.58 bits/param</span>
-        <span class="badge badge-accent">96.15% MNIST</span>
-        <span class="badge badge-dark">15.4 KB model</span>
+<span class="badge badge-accent">95.35% MNIST</span>
+                <span class="badge badge-dark">19.95 KB model</span>
         <span class="badge badge-accent">0 DSP inference</span>
         <span class="badge badge-dark">49% natural sparsity</span>
     </div>
@@ -276,11 +276,11 @@
 <!-- Metrics -->
 <div class="metrics">
     <div class="metric">
-        <div class="value">96.15%</div>
+        <div class="value">95.35%</div>
         <div class="label">MNIST Accuracy</div>
     </div>
     <div class="metric">
-        <div class="value">15.4 KB</div>
+        <div class="value">19.95 KB</div>
         <div class="label">Model Size</div>
     </div>
     <div class="metric">
@@ -297,8 +297,8 @@
 <section id="paper">
     <div class="section-glass">
         <h2>Abstract</h2>
-        <p>We present <strong>GraphKAN</strong>, the first Kolmogorov-Arnold Network with discrete ternary weights {−1, 0, +1}, achieving <strong>1.58 bits per parameter</strong>. Our 4-phase quantization-aware training pipeline yields a counterintuitive result: <strong>quantization to ternary weights improves accuracy</strong> from 94.77% (float) to 96.15% (ternary) on MNIST — a <strong>regularization-by-quantization</strong> effect.</p>
-        <p>The resulting model occupies <strong>15.4 KB</strong>, fitting within the L1 cache of mainstream microcontrollers without requiring floating-point hardware. Random ternary KAN features with analytical least-squares output (ELM mode) achieve <strong>99.3%</strong> of full backpropagation accuracy at 31.6 KB.</p>
+        <p>We present <strong>GraphKAN</strong>, the first Kolmogorov-Arnold Network with discrete ternary control points {−1, 0, +1}, achieving <strong>1.58 bits per parameter</strong>. Our 4-phase quantization-aware training pipeline yields <strong>95.35%</strong> on MNIST at just <strong>19.95 KB</strong> — a <strong>regularization-by-quantization</strong> effect where ternary outperforms the float baseline.</p>
+        <p>Our method generalizes across five domains: <strong>MNIST</strong> (95.35%, 19.95 KB), <strong>Fashion-MNIST</strong> (85.04%, 12.77 KB), <strong>HAR</strong> (92.60%, 13.61 KB), <strong>FSDD audio</strong> (85.67%, 24.96 KB), and <strong>CIFAR-10</strong> (47.83%, 38.78 KB). All models fit in microcontroller SRAM without requiring floating-point hardware.</p>
     </div>
 </section>
 
@@ -414,15 +414,15 @@
                 <!-- Accuracy progression -->
                 <rect x="30" y="170" width="660" height="60" rx="14" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
                 <text x="360" y="190" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Accuracy progression</text>
-                <text x="100" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">94.77%</text>
-                <text x="280" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">95.78%</text>
-                <text x="460" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">96.09%</text>
-                <text x="630" y="212" text-anchor="middle" fill="#2d261b" font-size="14" font-weight="700">96.15%</text>
+                <text x="100" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">93.84%</text>
+                <text x="280" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">94.74%</text>
+                <text x="460" y="212" text-anchor="middle" fill="#3d3529" font-size="13" font-weight="600">95.32%</text>
+                <text x="630" y="212" text-anchor="middle" fill="#2d261b" font-size="14" font-weight="700">95.35%</text>
                 <!-- Delta labels -->
                 <text x="115" y="190" text-anchor="middle" fill="#b8a898" font-size="9">—</text>
-                <text x="295" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+1.01%</text>
-                <text x="475" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.31%</text>
-                <text x="645" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.06%</text>
+                <text x="295" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.90%</text>
+                <text x="475" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.58%</text>
+                <text x="645" y="190" text-anchor="middle" fill="#b8a898" font-size="9">+0.03%</text>
                 <!-- Arrow between accuracy -->
                 <path d="M 140 205 L 240 205" stroke="#d4c5a9" stroke-width="1" marker-end="url(#arr)" opacity="0.5"/>
                 <path d="M 320 205 L 420 205" stroke="#d4c5a9" stroke-width="1" marker-end="url(#arr)" opacity="0.5"/>
@@ -495,15 +495,15 @@
                 <text x="60" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">GraphKAN (ours)</text>
                 <text x="175" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">ternary</text>
                 <text x="280" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">1.58</text>
-                <text x="375" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">15.4 KB</text>
-                <text x="475" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">96.15%</text>
+                <text x="375" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">19.95 KB</text>
+                <text x="475" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">95.35%</text>
                 <text x="575" y="186" text-anchor="middle" fill="#2d261b" font-size="11" font-weight="700">49%</text>
                 <text x="670" y="186" text-anchor="middle" fill="#2d261b" font-size="10" font-weight="700">0 DSP</text>
                 <!-- Footnotes -->
-                <text x="60" y="220" text-anchor="middle" fill="#b8a898" font-size="9">96.15% > 94.77% (float)</text>
+                <text x="60" y="220" text-anchor="middle" fill="#b8a898" font-size="9">95.35% > 93.84% (float)</text>
                 <text x="220" y="220" text-anchor="middle" fill="#b8a898" font-size="9">quantization improves accuracy</text>
-                <text x="420" y="220" text-anchor="middle" fill="#b8a898" font-size="9">1/6 the size of float KAN</text>
-                <text x="600" y="220" text-anchor="middle" fill="#b8a898" font-size="9">15× smaller than MLP</text>
+                <text x="420" y="220" text-anchor="middle" fill="#b8a898" font-size="9">1/16 the size of float KAN</text>
+                <text x="600" y="220" text-anchor="middle" fill="#b8a898" font-size="9">5× smaller than MLP</text>
                 <!-- Comparison lines -->
                 <path d="M 80 204 L 80 197" stroke="#b8a898" stroke-width="1"/>
                 <path d="M 400 204 L 400 197" stroke="#b8a898" stroke-width="1"/>
@@ -511,7 +511,7 @@
                 <!-- Additional metrics -->
                 <text x="360" y="250" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Additional results</text>
                 <rect x="15" y="258" width="225" height="30" rx="8" fill="rgba(255,255,255,0.2)"/>
-                <text x="127" y="276" text-anchor="middle" fill="#5a4f40" font-size="10">CIFAR-10 (GraphKAN): 82.3%</text>
+                <text x="127" y="276" text-anchor="middle" fill="#5a4f40" font-size="10">CIFAR-10: 47.83% (8×8 input)</text>
                 <rect x="248" y="258" width="225" height="30" rx="8" fill="rgba(255,255,255,0.2)"/>
                 <text x="360" y="276" text-anchor="middle" fill="#5a4f40" font-size="10">Fashion-MNIST (ELM): 99.3% of BP</text>
                 <rect x="481" y="258" width="225" height="30" rx="8" fill="rgba(255,255,255,0.2)"/>
@@ -545,8 +545,8 @@
                 <text x="350" y="150" text-anchor="middle" fill="#8b7d6b" font-size="10">→ built-in feature selection</text>
                 <rect x="480" y="100" width="220" height="55" rx="10" fill="rgba(255,255,255,0.2)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
                 <text x="590" y="120" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">Accuracy improvement</text>
-                <text x="590" y="137" text-anchor="middle" fill="#8b7d6b" font-size="10">94.77% (float) → 96.15% (ternary)</text>
-                <text x="590" y="150" text-anchor="middle" fill="#8b7d6b" font-size="10">+1.38 percentage points</text>
+                <text x="590" y="137" text-anchor="middle" fill="#8b7d6b" font-size="10">93.84% (float) → 95.35% (ternary)</text>
+                <text x="590" y="150" text-anchor="middle" fill="#8b7d6b" font-size="10">+1.51 percentage points</text>
                 <!-- More insight -->
                 <rect x="20" y="170" width="680" height="35" rx="10" fill="rgba(255,255,255,0.15)" stroke="rgba(180,150,120,0.15)" stroke-width="1"/>
                 <text x="360" y="192" text-anchor="middle" fill="#5a4f40" font-size="10">This mirrors the information bottleneck principle: limited capacity → generalizable representations</text>
@@ -582,7 +582,7 @@
                 <text x="400" y="134" text-anchor="middle" fill="#5a4f40" font-size="10">Depth scales N cycles = N layers</text>
                 <!-- Comparison bar -->
                 <rect x="20" y="160" width="660" height="28" rx="10" fill="rgba(255,255,255,0.15)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
-                <text x="350" y="178" text-anchor="middle" fill="#5a4f40" font-size="10">MNIST 96.15%: 79,800 ternary params — 2 min on consumer GPU</text>
+                <text x="350" y="178" text-anchor="middle" fill="#5a4f40" font-size="10">MNIST 95.35%: 19.95 KB — 2 min on consumer GPU</text>
             </svg>
         </div>
         <div class="svg-label">Extremely lightweight training — accessible to anyone with a consumer GPU</div>
@@ -610,8 +610,8 @@
                 <text x="185" y="138" text-anchor="middle" fill="#5a4f40" font-size="11">3 ternary control points</text>
                 <text x="185" y="156" text-anchor="middle" fill="#5a4f40" font-size="11">Graph message passing</text>
                 <rect x="40" y="168" width="290" height="20" rx="8" fill="rgba(180,150,120,0.12)"/>
-                <text x="46" y="182" fill="#2d261b" font-size="10" font-weight="600">✓ 96.15% MNIST</text>
-                <text x="185" y="182" text-anchor="middle" fill="#2d261b" font-size="10" font-weight="600">15.4 KB</text>
+                <text x="46" y="182" fill="#2d261b" font-size="10" font-weight="600">✓ 95.35% MNIST</text>
+                <text x="185" y="182" text-anchor="middle" fill="#2d261b" font-size="10" font-weight="600">19.95 KB</text>
                 <!-- Right column: CNN -->
                 <rect x="380" y="75" width="310" height="110" rx="14" fill="rgba(255,255,255,0.25)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
                 <text x="535" y="100" text-anchor="middle" fill="#2d261b" font-size="13" font-weight="600">CNN (conv)</text>
@@ -619,8 +619,8 @@
                 <text x="535" y="138" text-anchor="middle" fill="#5a4f40" font-size="11">Ternary conv + fc layers</text>
                 <text x="535" y="156" text-anchor="middle" fill="#5a4f40" font-size="11">Standard CNN topology</text>
                 <rect x="390" y="168" width="290" height="20" rx="8" fill="rgba(180,150,120,0.12)"/>
-                <text x="396" y="182" fill="#2d261b" font-size="10" font-weight="600">✓ 92.02% Fashion-MNIST</text>
-                <text x="535" y="182" text-anchor="middle" fill="#2d261b" font-size="10" font-weight="600">102.8 KB</text>
+                <text x="396" y="182" fill="#2d261b" font-size="10" font-weight="600">✓ 85.04% Fashion-MNIST</text>
+                <text x="535" y="182" text-anchor="middle" fill="#2d261b" font-size="10" font-weight="600">12.77 KB</text>
                 <!-- Arrow between -->
                 <path d="M 340 130 L 370 130" stroke="#b8a898" stroke-width="2" marker-end="url(#arq)" opacity="0.4"/>
                 <!-- Results table -->
@@ -631,13 +631,13 @@
                 <text x="560" y="222" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">16× smaller</text>
                 <!-- GraphKAN row -->
                 <rect x="20" y="240" width="330" height="30" rx="8" fill="rgba(255,255,255,0.15)"/>
-                <text x="60" y="260" text-anchor="middle" fill="#5a4f40" font-size="10">GraphKAN: 94.77%</text>
+                <text x="60" y="260" text-anchor="middle" fill="#5a4f40" font-size="10">GraphKAN: 93.84%</text>
                 <text x="185" y="260" text-anchor="middle" fill="#b8a898" font-size="10">→</text>
-                <text x="360" y="260" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="600">96.15%</text>
+                <text x="360" y="260" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="600">95.35%</text>
                 <rect x="390" y="240" width="310" height="30" rx="8" fill="rgba(255,255,255,0.15)"/>
-                <text x="460" y="260" text-anchor="middle" fill="#5a4f40" font-size="10">CNN: 91.57%</text>
+                <text x="460" y="260" text-anchor="middle" fill="#5a4f40" font-size="10">CNN: 83.12%</text>
                 <text x="545" y="260" text-anchor="middle" fill="#b8a898" font-size="10">→</text>
-                <text x="680" y="260" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="600">92.02%</text>
+                <text x="680" y="260" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="600">85.04%</text>
                 <!-- Key message -->
                 <rect x="20" y="283" width="680" height="25" rx="8" fill="rgba(180,150,120,0.08)" stroke="rgba(180,150,120,0.15)" stroke-width="1"/>
                 <text x="360" y="300" text-anchor="middle" fill="#5a4f40" font-size="10">Both architectures show regularization-by-quantization: ternary > float</text>
@@ -796,7 +796,7 @@
                 <text x="500" y="112" text-anchor="middle" fill="#5a4f40" font-size="10">Smartwatch DSP</text>
                 <!-- Summary -->
                 <rect x="180" y="145" width="380" height="36" rx="12" fill="rgba(255,255,255,0.3)" stroke="rgba(180,150,120,0.2)" stroke-width="1"/>
-                <text x="370" y="160" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">15.4 KB — fits in L1 cache of any modern microcontroller</text>
+                <text x="370" y="160" text-anchor="middle" fill="#5a4f40" font-size="11" font-weight="500">19.95 KB — fits in L1 cache of any modern microcontroller</text>
                 <text x="370" y="175" text-anchor="middle" fill="#8b7d6b" font-size="10">Zero FPU. Zero DSP. Only add/shift operations.</text>
             </svg>
         </div>
