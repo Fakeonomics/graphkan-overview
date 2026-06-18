@@ -69,4 +69,4 @@ Proprietary technology — All Rights Reserved.
 Codebase is private. [Full paper](https://fakeonomics.github.io/graphkan-overview/) available.  
 For licensing inquiries, contact via GitHub.
 
-*Created by Fakeonomics, June 2026.*
+*Created by Yuriy Venediktov, June 2026.*
