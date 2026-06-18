@@ -1,6 +1,6 @@
-[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)]() [![GraphKAN Site](https://img.shields.io/badge/GraphKAN-Live%20Site-blue?style=for-the-badge)](https://fakeonomics.github.io/graphkan-overview/) [![VSA Reasoning](https://img.shields.io/badge/VSA%20Reasoning-Live%20Site-228b22?style=for-the-badge)](https://fakeonomics.github.io/vsa-reasoning-overview/)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)]() [![GraphKAN Site](https://img.shields.io/badge/GraphKAN-Live%20Site-blue?style=for-the-badge)](https://fakeonomics.github.io/graphkan-overview/) [![TernaT](https://img.shields.io/badge/TernaT-Live%20Site-228b22?style=for-the-badge)](https://fakeonomics.github.io/TernaT-overview/)
 
-**GraphKAN Live Site** · **VSA Reasoning Live Site**
+**GraphKAN Live Site** · **TernaT Live Site**
 
 ---
 
