@@ -12,7 +12,8 @@
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80') center/cover no-repeat fixed;
+            background: linear-gradient(135deg, #1a1510 0%, #2d2318 25%, #1e1a14 50%, #2a2015 75%, #161210 100%);
+            background-attachment: fixed;
             color: #f5f0e8;
             line-height: 1.7;
             min-height: 100vh;
@@ -22,8 +23,12 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(45,38,27,0.55) 0%, rgba(30,25,18,0.4) 40%, rgba(50,40,30,0.5) 70%, rgba(35,28,20,0.55) 100%);
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(180,150,120,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(200,170,130,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(160,130,100,0.08) 0%, transparent 60%);
             z-index: 0;
+            animation: bgPulse 15s ease-in-out infinite alternate;
         }
         .bg-shapes {
             position: fixed;
@@ -61,6 +66,11 @@
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(30px, -30px) scale(1.05); }
             66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        @keyframes bgPulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.85; }
         }
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
