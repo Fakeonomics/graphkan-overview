@@ -1,7 +1,5 @@
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red)]() [![GraphKAN Site](https://img.shields.io/badge/GraphKAN-Live%20Site-blue?style=for-the-badge)](https://fakeonomics.github.io/graphkan-overview/) [![TernaT](https://img.shields.io/badge/TernaT-Live%20Site-228b22?style=for-the-badge)](https://fakeonomics.github.io/TernaT-overview/)
 
-**GraphKAN Live Site** · **TernaT Live Site**
-
 ---
 
 # GraphKAN: Ternary Kolmogorov-Arnold Network
@@ -68,5 +66,3 @@ Hidden layer frozen at random ternary weights, output solved via closed-form lea
 Proprietary technology — All Rights Reserved.  
 Codebase is private. [Full paper](https://fakeonomics.github.io/graphkan-overview/) available.  
 For licensing inquiries, contact via GitHub.
-
-*Created by Yuriy Venediktov, June 2026.*
